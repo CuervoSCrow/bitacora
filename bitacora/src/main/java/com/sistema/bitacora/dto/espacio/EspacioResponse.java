@@ -1,5 +1,6 @@
 package com.sistema.bitacora.dto.espacio;
 
+import com.sistema.bitacora.entity.Espacio;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,4 +16,13 @@ public class EspacioResponse {
     private String estadoActual;
     //    private String recursosBaseJson;
     private boolean activo;
+
+    public EspacioResponse(Espacio espacio){
+        this.id = espacio.getId();
+        this.nombreEspacio = espacio.getNombreEspacio();
+        this.ubicacion = espacio.getUbicacion();
+        this.capacidad = espacio.getCapacidad();
+        this.estadoActual = espacio.getEstadoActual();
+        this.activo = espacio.getActivo();
+    }
 }

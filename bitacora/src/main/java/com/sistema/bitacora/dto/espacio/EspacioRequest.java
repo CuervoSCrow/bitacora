@@ -7,8 +7,10 @@ import lombok.Setter;
 @Getter @Setter
 @AllArgsConstructor
 public class EspacioRequest {
+    private String nombreEspacio;
+    private String ubicacion;
     private Integer capacidad;
     private String estadoActual;
     private String recursosBaseJson;
-    private boolean activo;
+    private Boolean activo;
 }

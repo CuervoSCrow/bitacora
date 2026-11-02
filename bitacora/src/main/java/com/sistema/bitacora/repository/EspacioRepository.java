@@ -36,13 +36,18 @@ public interface EspacioRepository extends
             """)
     List<EspacioResponse> findAllEspacio(Sort sort);
 
-//    List<Espacio> findAllByOrderByNombreEspacioAsc();
+    @Query("""
+            SELECT new com.sistema.bitacora.dto.espacio.EspacioResponse
+            (e.id, e.nombreEspacio,e.ubicacion,e.capacidad,e.estadoActual,e.activo)
+            FROM Espacio e
+            WHERE UPPER(e.nombreEspacio) LIKE UPPER(CONCAT('%',:infix,'%'))            
+            """)
+    List<EspacioResponse> findByNombreContainigIgnoreCase(
+            @Param("infix") String infix, Sort sort);
 
     List<Espacio> findByActivoTrueOrderByNombreEspacioAsc();
 
-    Optional<Espacio> findByNombreEspacioIgnoreCase(
-            String nombreEspacio
-    );
+
 
     boolean existsByNombreEspacioIgnoreCaseAndIdNot(
             String nombreEspacio,

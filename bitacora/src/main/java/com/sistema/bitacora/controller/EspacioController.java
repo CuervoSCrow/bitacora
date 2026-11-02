@@ -1,15 +1,15 @@
 package com.sistema.bitacora.controller;
 
 
+import com.sistema.bitacora.dto.espacio.EspacioRequest;
 import com.sistema.bitacora.dto.espacio.EspacioResponse;
+import com.sistema.bitacora.exception.InvalidOperationException;
+import com.sistema.bitacora.exception.ResourceNotFoundException;
 import com.sistema.bitacora.service.EspacioServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,7 +22,7 @@ public class EspacioController {
 
     private final EspacioServiceImpl espacioService;
 
-    @GetMapping("/{nombre}")
+    @GetMapping("/nombre/{nombre}")
     public ResponseEntity<?> findByNombre(@PathVariable String nombre) {
         Optional<EspacioResponse> espacio =
                 this.espacioService.findEspacioByNombre(nombre);
@@ -42,6 +42,7 @@ public class EspacioController {
         }
         return ResponseEntity.ok(espacio.get());
     }
+
     @GetMapping("/findAll")
     public ResponseEntity<?> findAll(){
         List<EspacioResponse> espacios = this.espacioService.findAllEspacio();
@@ -50,4 +51,45 @@ public class EspacioController {
         }
         return ResponseEntity.ok(espacios);
     }
+
+    @GetMapping("{infix}")
+    public ResponseEntity<?> findByNombreContainingIgnoreCase(
+            @PathVariable String infix){
+        List<EspacioResponse> espacios =
+                this.espacioService.findByNombreContainingIgnoreCase(infix);
+        if(espacios.isEmpty()){
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(espacios);
+    }
+
+    @PostMapping
+    public ResponseEntity<?> create(@RequestBody EspacioRequest request){
+        EspacioResponse espacio = espacioService.createEspacio(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(espacio);
+    }
+
+    @PutMapping
+    public ResponseEntity<?> update(@PathVariable Long id,
+                                    @RequestBody EspacioRequest request){
+        try{
+            EspacioResponse espacio =
+                    espacioService.updateEspacio(id,request);
+            return ResponseEntity.ok(espacio);
+        }catch(ResourceNotFoundException e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }catch(InvalidOperationException e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }catch(Exception e){
+            return ResponseEntity.internalServerError().body(
+                    "Ha ocurrido un error inesperado");
+        }
+    }
+    @PatchMapping("{id}/activo")
+    public ResponseEntity<?> cambiarActivo(@PathVariable("id") Long id,
+                                          @RequestBody EspacioRequest request){
+
+    }
+
+
 }

@@ -1,5 +1,7 @@
 package com.sistema.bitacora.entity;
 
+import com.sistema.bitacora.dto.espacio.EspacioRequest;
+import com.sistema.bitacora.dto.espacio.EspacioResponse;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -31,9 +33,29 @@ public class Espacio {
     @Column(name = "estado_actual", length = 30)
     private String estadoActual = "DISPONIBLE";
 
+    @Column
+    private Boolean activo = true;
+
     @Column(name = "recursos_base_json", columnDefinition = "TEXT")
     private String recursosBaseJson;
 
-    @Column
-    private Boolean activo = true;
+
+
+    public Espacio(EspacioRequest request){
+        this.nombreEspacio = request.getNombreEspacio();
+        this.ubicacion = request.getUbicacion();
+        this.capacidad = request.getCapacidad();
+        this.estadoActual= request.getEstadoActual();
+        this.activo=true;
+    }
+
+    public Espacio(EspacioResponse response,
+                   EspacioRequest request){
+        this.id = response.getId();
+        this.nombreEspacio= request.getNombreEspacio();
+        this.ubicacion= request.getUbicacion();
+        this.capacidad= request.getCapacidad();
+        this.estadoActual= request.getEstadoActual();
+        this.activo=request.getActivo();
+    }
 }

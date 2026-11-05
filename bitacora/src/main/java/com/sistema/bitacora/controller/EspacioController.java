@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
@@ -87,8 +88,9 @@ public class EspacioController {
     }
     @PatchMapping("{id}/activo")
     public ResponseEntity<?> cambiarActivo(@PathVariable("id") Long id,
-                                          @RequestBody EspacioRequest request){
-
+                                          @RequestParam Boolean activo){
+       EspacioResponse espacio = espacioService.cambiarActivo(id,activo);
+       return ResponseEntity.ok(espacio);
     }
 
 

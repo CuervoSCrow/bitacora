@@ -90,13 +90,13 @@ public class EspacioServiceImpl implements EspacioService {
                     HttpStatus.BAD_REQUEST,
                     "Debes indicar si el espacio estara activo");
         }
+        Espacio espacio = this.espacioRepository.findById(id).
+                orElseThrow(()->new ResourceNotFoundException(
+                        "No se puede efectuar la modificación, el espacio no existe."
+                ));
+        espacio.setActivo(activo);
+        Espacio espacioModificado = this.espacioRepository.save(espacio);
+        return new EspacioResponse(espacioModificado);
 
-        Optional<EspacioResponse> espacioDB =
-                this.espacioRepository.findEspacioById(id);
-        if(espacioDB.isEmpty()){
-            throw new ResourceNotFoundException("No se puede efectuar la modificacion, " +
-                    "el espacio no existe");
-        }
-        Optional<EspacioResponse> otroEspacio =
     }
 }

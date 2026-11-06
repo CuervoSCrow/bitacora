@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
@@ -34,7 +33,7 @@ public class EspacioController {
         return ResponseEntity.ok(espacio.get());
     }
 
-    @GetMapping("/id/{id}")
+    @GetMapping("{id}")
     public ResponseEntity<?> findBYId(@PathVariable Long id) {
         Optional<EspacioResponse> espacio = this.espacioService.findEspacioById(id);
         if (espacio.isEmpty()) {
@@ -44,7 +43,7 @@ public class EspacioController {
         return ResponseEntity.ok(espacio.get());
     }
 
-    @GetMapping("/findAll")
+    @GetMapping()
     public ResponseEntity<?> findAll(){
         List<EspacioResponse> espacios = this.espacioService.findAllEspacio();
         if(espacios.isEmpty()){
@@ -53,7 +52,7 @@ public class EspacioController {
         return ResponseEntity.ok(espacios);
     }
 
-    @GetMapping("{infix}")
+    @GetMapping("/find/{infix}")
     public ResponseEntity<?> findByNombreContainingIgnoreCase(
             @PathVariable String infix){
         List<EspacioResponse> espacios =
@@ -70,7 +69,7 @@ public class EspacioController {
         return ResponseEntity.status(HttpStatus.CREATED).body(espacio);
     }
 
-    @PutMapping
+    @PutMapping("/{id}")
     public ResponseEntity<?> update(@PathVariable Long id,
                                     @RequestBody EspacioRequest request){
         try{

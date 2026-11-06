@@ -4,7 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
+
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
@@ -63,5 +64,12 @@ public class GlobalExceptionHandler{
         return ResponseEntity.internalServerError()
                 .body("Ha ocurrido un error inesperado");
 
+    }
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<?> handleMethodNotSupported(
+            HttpRequestMethodNotSupportedException e){
+        return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED)
+                .body("Método "+e.getMethod()+" no permitido para la ruta. "+
+                        "Métodos soportados: "+e.getSupportedHttpMethods());
     }
 }

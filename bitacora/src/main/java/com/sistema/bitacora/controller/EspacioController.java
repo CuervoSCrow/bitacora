@@ -6,10 +6,12 @@ import com.sistema.bitacora.dto.espacio.EspacioResponse;
 import com.sistema.bitacora.exception.InvalidOperationException;
 import com.sistema.bitacora.exception.ResourceNotFoundException;
 import com.sistema.bitacora.service.EspacioServiceImpl;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 
 import java.util.List;
 import java.util.Optional;
@@ -64,7 +66,7 @@ public class EspacioController {
     }
 
     @PostMapping
-    public ResponseEntity<?> create(@RequestBody EspacioRequest request){
+    public ResponseEntity<?> create(@RequestBody @Valid EspacioRequest request){
         EspacioResponse espacio = espacioService.createEspacio(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(espacio);
     }

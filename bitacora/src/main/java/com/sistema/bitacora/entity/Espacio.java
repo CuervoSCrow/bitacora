@@ -2,6 +2,7 @@ package com.sistema.bitacora.entity;
 
 import com.sistema.bitacora.dto.espacio.EspacioRequest;
 import com.sistema.bitacora.dto.espacio.EspacioResponse;
+import com.sistema.bitacora.entity.enums.EstadoEspacio;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,6 +13,7 @@ import lombok.Setter;
 @Table(name = "espacios")
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor
+
 public class Espacio {
 
     @Id
@@ -30,8 +32,9 @@ public class Espacio {
     @Column(nullable = false)
     private Integer capacidad;
 
+    @Enumerated(EnumType.STRING) //<- guarda "DISPONIBLE", no 0/1/2
     @Column(name = "estado_actual", length = 30)
-    private String estadoActual = "DISPONIBLE";
+    private EstadoEspacio estadoActual;
 
     @Column
     private Boolean activo = true;

@@ -1,6 +1,7 @@
 package com.sistema.bitacora.dto.espacio;
 
 import com.sistema.bitacora.entity.Espacio;
+import com.sistema.bitacora.entity.enums.EstadoEspacio;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,7 +14,7 @@ public class EspacioResponse {
     private String nombreEspacio;
     private String ubicacion;
     private Integer capacidad;
-    private String estadoActual;
+    private EstadoEspacio estadoActual;
     //    private String recursosBaseJson;
     private boolean activo;
 

@@ -9,7 +9,7 @@ import com.sistema.bitacora.repository.EspacioRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
+
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -49,10 +49,12 @@ public class EspacioServiceImpl implements EspacioService {
 
     @Override
     public EspacioResponse createEspacio(EspacioRequest request) {
-        Optional<EspacioResponse> espacioDB = findEspacioByNombre(request.getNombreEspacio());
-        if(espacioDB.isPresent()){
-            return espacioDB.get();
-        }
+        findEspacioByNombre(request.getNombreEspacio()).ifPresent(
+                e-> {
+                    throw new InvalidOperationException(
+                            "Ya existe el espacio con el nombre '"+request.getNombreEspacio()+"'");
+                });
+
         Espacio espacio = new Espacio(request);
         Espacio espacioNuevo = this.espacioRepository.save(espacio);
         return new EspacioResponse(espacioNuevo);

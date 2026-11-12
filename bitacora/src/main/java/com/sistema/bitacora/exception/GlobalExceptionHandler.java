@@ -4,14 +4,23 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.validation.FieldError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.NoHandlerFoundException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
+import tools.jackson.databind.exc.InvalidFormatException;
 
+import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler{
@@ -71,5 +80,57 @@ public class GlobalExceptionHandler{
         return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED)
                 .body("Método "+e.getMethod()+" no permitido para la ruta. "+
                         "Métodos soportados: "+e.getSupportedHttpMethods());
+    }
+//    404 - ruta no encontrada (SpringBoot 6.1 + Boot 3.2)
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<?> handleNoResourceFound(NoResourceFoundException e){
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body("Ruta no encontrada: "+e.getResourcePath());
+    }
+
+//    Ruta no encontrada (Spring Boot con trhow-exception-if-no-handler-found-true
+    @ExceptionHandler(NoHandlerFoundException.class)
+    public ResponseEntity<?> handleNoHandlerFound(NoHandlerFoundException e){
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body("Ruta no encontrada: "+e.getRequestURL());
+    }
+
+//    400 - Validación de @Valid falló en el @RequestBody
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<?> handleValidation(MethodArgumentNotValidException e){
+        Map<String,String > errores =e.getBindingResult().getFieldErrors().stream()
+                .collect(Collectors.toMap(
+                        FieldError::getField,
+                        fe -> fe.getDefaultMessage()!=null
+                            ? fe.getDefaultMessage()
+                            :"valor invalido",
+                        (a,b)->a // si hay dos errores en el mismo campo quedate con el primero
+                ));
+        return ResponseEntity.badRequest().body(errores);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<?> handleNotReadable(HttpMessageNotReadableException e){
+//        Case enum inválido: extraemos el valor y los valores válidos del mensaje
+        Throwable cause= e.getCause();
+        if(cause instanceof InvalidFormatException ife
+            && ife.getTargetType()!=null
+            && ife.getTargetType().isEnum()){
+
+            String valor = String.valueOf(ife.getValue());
+            String campo = ife.getPath().isEmpty()
+                    ?"desconocido"
+                    : ife.getPath().get(ife.getPath().size() -1).getPropertyName();
+            String validos = java.util.Arrays.stream(ife.getTargetType().getEnumConstants())
+                    .map(Object::toString)
+                    .collect(java.util.stream.Collectors.joining(", "));
+
+            return ResponseEntity.badRequest().body(
+                    "Valor inválido '"+valor+"' para el campo '"+campo+
+                            "'.Valores permitidos "+validos);
+        }
+//        cualquier otro JSon Mal formado
+        return ResponseEntity.badRequest()
+                .body("JSON malformado o tipo invalido en el body");
     }
 }

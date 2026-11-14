@@ -3,6 +3,7 @@ package com.sistema.bitacora.entity;
 import com.sistema.bitacora.dto.espacio.EspacioRequest;
 import com.sistema.bitacora.dto.espacio.EspacioResponse;
 import com.sistema.bitacora.entity.enums.EstadoEspacio;
+import com.sistema.bitacora.entity.enums.EstadoEspacioConverter;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -32,7 +33,8 @@ public class Espacio {
     @Column(nullable = false)
     private Integer capacidad;
 
-    @Enumerated(EnumType.STRING) //<- guarda "DISPONIBLE", no 0/1/2
+//    @Enumerated(EnumType.STRING) //<- guarda "DISPONIBLE", no 0/1/2
+    @Convert(converter = EstadoEspacioConverter.class)
     @Column(name = "estado_actual", length = 30)
     private EstadoEspacio estadoActual;
 

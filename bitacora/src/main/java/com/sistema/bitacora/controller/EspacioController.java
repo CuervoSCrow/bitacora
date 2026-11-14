@@ -3,8 +3,7 @@ package com.sistema.bitacora.controller;
 
 import com.sistema.bitacora.dto.espacio.EspacioRequest;
 import com.sistema.bitacora.dto.espacio.EspacioResponse;
-import com.sistema.bitacora.exception.InvalidOperationException;
-import com.sistema.bitacora.exception.ResourceNotFoundException;
+
 import com.sistema.bitacora.service.EspacioServiceImpl;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -72,20 +71,9 @@ public class EspacioController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(@PathVariable Long id,
-                                    @RequestBody EspacioRequest request){
-        try{
-            EspacioResponse espacio =
-                    espacioService.updateEspacio(id,request);
-            return ResponseEntity.ok(espacio);
-        }catch(ResourceNotFoundException e){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }catch(InvalidOperationException e){
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }catch(Exception e){
-            return ResponseEntity.internalServerError().body(
-                    "Ha ocurrido un error inesperado");
-        }
+    public ResponseEntity<EspacioResponse> update(@PathVariable Long id,
+                                    @RequestBody @Valid EspacioRequest request){
+       return ResponseEntity.ok(espacioService.updateEspacio(id,request));
     }
     @PatchMapping("{id}/activo")
     public ResponseEntity<?> cambiarActivo(@PathVariable("id") Long id,
@@ -93,6 +81,12 @@ public class EspacioController {
        EspacioResponse espacio = espacioService.cambiarActivo(id,activo);
        return ResponseEntity.ok(espacio);
     }
+    //metodo que suma 2 numeros
+
+
+
+
+
 
 
 }

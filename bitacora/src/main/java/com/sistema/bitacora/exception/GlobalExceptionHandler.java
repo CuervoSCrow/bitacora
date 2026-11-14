@@ -9,6 +9,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
@@ -19,7 +20,6 @@ import tools.jackson.databind.exc.InvalidFormatException;
 
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 @RestControllerAdvice
@@ -132,5 +132,12 @@ public class GlobalExceptionHandler{
 //        cualquier otro JSon Mal formado
         return ResponseEntity.badRequest()
                 .body("JSON malformado o tipo invalido en el body");
+    }
+
+//    400 - falta un @RequestParam obligatorio
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<?> handleMissingParam(MissingServletRequestParameterException e){
+        return ResponseEntity.badRequest()
+                .body("Falta el parametro requerido: "+e.getParameterName());
     }
 }

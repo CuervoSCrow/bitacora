@@ -81,7 +81,25 @@ public class EspacioController {
        EspacioResponse espacio = espacioService.cambiarActivo(id,activo);
        return ResponseEntity.ok(espacio);
     }
-    //metodo que suma 2 numeros
+
+
+
+    
+    
+    
+    
+
+
+    
+    
+
+
+
+
+
+
+
+
 
 
 

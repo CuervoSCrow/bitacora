@@ -6,6 +6,7 @@ import com.sistema.bitacora.entity.Espacio;
 import com.sistema.bitacora.repository.EspacioRepository;
 import com.sistema.bitacora.repository.InventarioEspacioRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -23,8 +24,12 @@ public class InventarioEspacioServiceImpl implements InventarioEspacioService{
 
     @Override
     public List<InventarioEspacioResponse> listar(Long espacioId) {
-
-
+        Sort.Order order = Sort.Order.by("nombreItem")
+                .with(Sort.Direction.ASC)
+                .ignoreCase();
+        Sort sort = Sort.by(order);
+        return this.inventarioEspacioRepository
+                .finByEspacioIdOrderByNombreItemAsc(espacioId,sort);
     }
 
     private EspacioResponse buscarEspacio(Long espacioId){

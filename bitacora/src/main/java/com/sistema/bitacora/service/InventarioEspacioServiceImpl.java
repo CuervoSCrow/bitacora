@@ -29,7 +29,7 @@ public class InventarioEspacioServiceImpl implements InventarioEspacioService{
                 .ignoreCase();
         Sort sort = Sort.by(order);
         return this.inventarioEspacioRepository
-                .finByEspacioIdOrderByNombreItemAsc(espacioId,sort);
+                .finByEspacioId(espacioId,sort);
     }
 
     private EspacioResponse buscarEspacio(Long espacioId){

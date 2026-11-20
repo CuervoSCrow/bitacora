@@ -15,12 +15,8 @@ public interface InventarioEspacioRepository extends JpaRepository <InventarioEs
         SELECT new com.sistema.bitacora.dto.inventarioEspacio.InventarioEspacioResponse
         (i.id,i.nombreItem,i.descripcion,i.cantidad,i.estadoBien,i.fechaRegistro)
         FROM InventarioEspacio i
-        WHERE i.id=:id
+        WHERE i.espacio.id=:espacioId
     """)
-    List<InventarioEspacioResponse> finByEspacioId(Long espacioId, Sort sort);
+    List<InventarioEspacioResponse> findByEspacioId(Long espacioId, Sort sort);
 
-    Optional<InventarioEspacioResponse> findByIdAndEspacio_Id(Long id, Long espacioId);
-
-    List<InventarioEspacioResponse> findByEspacioIdAndEspacioBienId(
-            Long espacioId,List<String>estados);
 }

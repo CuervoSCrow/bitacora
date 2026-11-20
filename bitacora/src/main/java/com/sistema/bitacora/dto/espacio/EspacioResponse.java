@@ -14,9 +14,11 @@ public class EspacioResponse {
     private String nombreEspacio;
     private String ubicacion;
     private Integer capacidad;
+
     private EstadoEspacio estadoActual;
     //    private String recursosBaseJson;
     private boolean activo;
+
 
     public EspacioResponse(Espacio espacio){
         this.id = espacio.getId();
@@ -26,4 +28,6 @@ public class EspacioResponse {
         this.estadoActual = espacio.getEstadoActual();
         this.activo = espacio.getActivo();
     }
+
+
 }

@@ -259,7 +259,7 @@ public class EspacioRepositoryTest {
     }
 
     @Test
-    @DisplayName("Debe Retornar Vacio cuando no hay coincidencias")
+    @DisplayName("Debe Retornar vacío cuando no hay coincidencias")
     void shouldRetirnEmpty_whenNotMatches(){
 //        Act
         List<EspacioResponse> resultado =
@@ -267,6 +267,22 @@ public class EspacioRepositoryTest {
 //        Asset
         assertThat(resultado).isEmpty();
 
+    }
+
+    @Test
+    @DisplayName("debe aplicar sort sobre los resultados filtrados")
+    void shouldApplySort_whenMatchesExists(){
+//        Arrange
+        Sort sortByNombreDesc = Sort.by(Sort.Direction.DESC,"nombreEspacio");
+
+//        Act
+        List<EspacioResponse> resultado =
+                espacioRepository.findByNombreContainigIgnoreCase("sala",sortByNombreDesc);
+
+//        Assert
+        assertThat(resultado)
+                .extracting(EspacioResponse::getNombreEspacio)
+                .containsExactly("Sala B","Sala A");
     }
 
 

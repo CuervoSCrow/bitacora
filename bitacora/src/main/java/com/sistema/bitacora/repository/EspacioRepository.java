@@ -40,12 +40,12 @@ public interface EspacioRepository extends
             SELECT new com.sistema.bitacora.dto.espacio.EspacioResponse
             (e.id, e.nombreEspacio,e.ubicacion,e.capacidad,e.estadoActual,e.activo)
             FROM Espacio e
-            WHERE UPPER(e.nombreEspacio) LIKE UPPER(CONCAT('%',:infix,'%'))            
+            WHERE UPPER(e.nombreEspacio) LIKE UPPER(CONCAT('%',:infix,'%'))
             """)
-    List<EspacioResponse> findByNombreContainigIgnoreCase(
+    List<EspacioResponse> findByNombreContainingIgnoreCase(
             @Param("infix") String infix, Sort sort);
 
-    List<Espacio> findByActivoTrueOrderByNombreEspacioAsc();
+    List<EspacioResponse> findByActivoTrue(Sort sort);
 
 
 

@@ -75,7 +75,7 @@ public class EspacioRepositoryTest {
                 .build());
     }// fin setup
 
- //    =================================================
+//    =================================================
 //          findEspacioById
 //    =================================================
     @Nested
@@ -128,10 +128,10 @@ public class EspacioRepositoryTest {
 
     @Nested
     @DisplayName("findEspacioByNombre(String")
-    class findEspacioByNombre{
+    class findEspacioByNombre {
         @Test
         @DisplayName("Debe retornar el dto cuando el nombre coincida exactamente")
-        void shouldReturnDto_whenNombreMatchesExactly(){
+        void shouldReturnDto_whenNombreMatchesExactly() {
 //            Arrange
             String nombreExistente = "Sala A";
 
@@ -149,7 +149,7 @@ public class EspacioRepositoryTest {
 
         @Test
         @DisplayName("Debe retornar vacio cuando el nombre no existe")
-        void shouldReturnEmpty_whenNombreDoesNotExists(){
+        void shouldReturnEmpty_whenNombreDoesNotExists() {
 //            Act
             Optional<EspacioResponse> resultado = espacioRepository.findEspacioByNombre("Sala Inexistente");
 
@@ -159,7 +159,7 @@ public class EspacioRepositoryTest {
 
         @Test
         @DisplayName("Debe ser case-sensitive por que el JPQL usa '='")
-        void shouldBeCaseSensitive_whenComparingName(){
+        void shouldBeCaseSensitive_whenComparingName() {
 //            Act
             Optional<EspacioResponse> resultado =
                     espacioRepository.findEspacioByNombre("sala a");
@@ -176,10 +176,10 @@ public class EspacioRepositoryTest {
 
     @Nested
     @DisplayName("findAllEspacio(Sort)")
-    class findAllEspacio{
+    class findAllEspacio {
         @Test
         @DisplayName("Debe retornar todos los espacios mapeados a DTO")
-        void shouldReturnAllEspaciosMappedToDto(){
+        void shouldReturnAllEspaciosMappedToDto() {
 //            Act
             List<EspacioResponse> resultado =
                     espacioRepository.findAllEspacio(Sort.unsorted());
@@ -189,15 +189,15 @@ public class EspacioRepositoryTest {
                     .hasSize(4)
                     .extracting(EspacioResponse::getNombreEspacio)
                     .containsExactlyInAnyOrder(
-                            "Sala A","Sala B","Laboratorio C","Auditorio"
+                            "Sala A", "Sala B", "Laboratorio C", "Auditorio"
                     );
         }
 
         @Test
         @DisplayName("Debe respetar el orden indicado por Sort")
-        void shouldSortResults_whenSortIsProvided(){
+        void shouldSortResults_whenSortIsProvided() {
 //            Arrange
-            Sort sortByNombreAsc = Sort.by(Sort.Direction.ASC,"nombreEspacio");
+            Sort sortByNombreAsc = Sort.by(Sort.Direction.ASC, "nombreEspacio");
 
 //            Act
             List<EspacioResponse> resultado =
@@ -205,12 +205,12 @@ public class EspacioRepositoryTest {
 //            Assert
             assertThat(resultado)
                     .extracting(EspacioResponse::getNombreEspacio)
-                    .containsExactly("Auditorio","Laboratorio C","Sala A","Sala B");
+                    .containsExactly("Auditorio", "Laboratorio C", "Sala A", "Sala B");
         }
 
         @Test
         @DisplayName("Debe retornar lista vacía cuando no hay registros")
-        void shouldReturnEmptyList_whenNoRecordExists(){
+        void shouldReturnEmptyList_whenNoRecordExists() {
 //            Arrange
             espacioRepository.deleteAll();
 
@@ -223,32 +223,32 @@ public class EspacioRepositoryTest {
         }
     }
 
-//    =================================================
+    //    =================================================
 //      findByNombreContainingIgnoreCase
 //    =================================================
     @Nested
     @DisplayName("findByNombreContainingIgnoreCase(String, Sort)")
-    class FindByNombreContainingIgnoreCase{
+    class FindByNombreContainingIgnoreCase {
         @Test
         @DisplayName("debe retornar coincidencias parciales sin distinyir mayusculas y minusculas")
-        void shouldReurnPartialMatchesIgnoringCase(){
+        void shouldReurnPartialMatchesIgnoringCase() {
 //            Act
             List<EspacioResponse> resultado =
-                    espacioRepository.findByNombreContainigIgnoreCase("Sala",Sort.unsorted());
+                    espacioRepository.findByNombreContainingIgnoreCase("Sala", Sort.unsorted());
 
 //            Assert
             assertThat(resultado)
                     .hasSize(2)
                     .extracting(EspacioResponse::getNombreEspacio)
-                    .containsExactlyInAnyOrder("Sala A","Sala B");
+                    .containsExactlyInAnyOrder("Sala A", "Sala B");
         }
 
         @Test
-    @DisplayName("Debe ignorar mayúsculas/minúsculas en el infix")
-    void shouldIgnoreCase_WhenInfixUppercase(){
+        @DisplayName("Debe ignorar mayúsculas/minúsculas en el infix")
+        void shouldIgnoreCase_WhenInfixUppercase() {
 //            Act
             List<EspacioResponse> resultado =
-                    espacioRepository.findByNombreContainigIgnoreCase("LABORATORIO",Sort.unsorted());
+                    espacioRepository.findByNombreContainingIgnoreCase("LABORATORIO", Sort.unsorted());
 
 //            Assert
             assertThat(resultado)
@@ -256,34 +256,131 @@ public class EspacioRepositoryTest {
                     .extracting(EspacioResponse::getNombreEspacio)
                     .containsExactly("Laboratorio C");
         }
-    }
 
-    @Test
-    @DisplayName("Debe Retornar vacío cuando no hay coincidencias")
-    void shouldRetirnEmpty_whenNotMatches(){
+        @Test
+        @DisplayName("Debe Retornar vacío cuando no hay coincidencias")
+        void shouldRetirnEmpty_whenNotMatches() {
 //        Act
-        List<EspacioResponse> resultado =
-                espacioRepository.findByNombreContainigIgnoreCase("xyz",Sort.unsorted());
+            List<EspacioResponse> resultado =
+                    espacioRepository.findByNombreContainingIgnoreCase("xyz", Sort.unsorted());
 //        Asset
-        assertThat(resultado).isEmpty();
+            assertThat(resultado).isEmpty();
 
-    }
+        }
 
-    @Test
-    @DisplayName("debe aplicar sort sobre los resultados filtrados")
-    void shouldApplySort_whenMatchesExists(){
+        @Test
+        @DisplayName("debe aplicar sort sobre los resultados filtrados")
+        void shouldApplySort_whenMatchesExists() {
 //        Arrange
-        Sort sortByNombreDesc = Sort.by(Sort.Direction.DESC,"nombreEspacio");
+            Sort sortByNombreDesc = Sort.by(Sort.Direction.DESC, "nombreEspacio");
 
 //        Act
-        List<EspacioResponse> resultado =
-                espacioRepository.findByNombreContainigIgnoreCase("sala",sortByNombreDesc);
+            List<EspacioResponse> resultado =
+                    espacioRepository.findByNombreContainingIgnoreCase("sala", sortByNombreDesc);
 
 //        Assert
-        assertThat(resultado)
-                .extracting(EspacioResponse::getNombreEspacio)
-                .containsExactly("Sala B","Sala A");
+            assertThat(resultado)
+                    .extracting(EspacioResponse::getNombreEspacio)
+                    .containsExactly("Sala B", "Sala A");
+        }
     }
 
+//    =================================================
+//      findByActivoTrueOrderByNombreEspacioAsc
+//    =================================================
+
+    @Nested
+    @DisplayName("findByActivoTrue")
+    class FidByActivoTrue {
+        @Test
+        @DisplayName("debe retornar solo activos ordenados por nombre ascendente")
+        void shouldReturnOnlyActive() {
+//            Arrange
+            Sort sortByNombreAsc = Sort.by(Sort.Direction.ASC, "nombreEspacio");
+//            Act
+            List<EspacioResponse> resultado =
+                    espacioRepository.findByActivoTrue(sortByNombreAsc);
+
+//            Assert
+            assertThat(resultado)
+                    .hasSize(3)
+                    .extracting(EspacioResponse::getNombreEspacio)
+                    .containsExactly("Auditorio", "Sala A", "Sala B");
+        }
+
+        @Test
+        @DisplayName("debe retornar vacio cuando todos los espacio esten inactivos")
+        void shouldReturnEmpty_whenAllInactive() {
+//            Arrange
+            List<Espacio> todos = espacioRepository.findAll();
+            todos.forEach(e -> e.setActivo(false));
+            espacioRepository.saveAll(todos);
+
+//            Assert
+            List<EspacioResponse> resultado =
+                    espacioRepository.findByActivoTrue(Sort.unsorted());
+
+            assertThat(resultado).isEmpty();
+        }
+
+        //    ==========================================================
+//      existsByNombreEspacioIgnoreCaseAndIdnot(String ,Long)
+//    ==========================================================
+        @Nested
+        @DisplayName("existsByNombreEspacioIgnoreCaseAndIdNot(String, Long")
+        class ExistsByNombreEspacioIgnoreCaseAndIdNot {
+
+            @Test
+            @DisplayName("debe retornar true cuando otro registro tiene el mismo nombre")
+            void shouldReturnTrue_whenAnotherRecordHasSameNombre() {
+//                Arrange
+                Long otro_Id = 999_999L;
+
+//                Act
+                boolean existe = espacioRepository
+                        .existsByNombreEspacioIgnoreCaseAndIdNot("Sala A", otro_Id);
+
+//                Assert
+                assertThat(existe).isTrue();
+            }
+
+            @Test
+            @DisplayName("debe ignorar mayúsculas/minúsculas al comparar")
+            void shouldIgnoreCase_whenComparingNombre() {
+//                Act
+                boolean existe = espacioRepository.existsByNombreEspacioIgnoreCaseAndIdNot(
+                        "sAlA a", 999_999L);
+//                Assert
+                assertThat(existe).isTrue();
+            }
+
+            @Test
+            @DisplayName("debe retornar fálse cuando el nombre pertenece al mismo ID")
+            void shouldReturnFalse_whenNombreBelongToSameId(){
+//                Arrange
+                Long idPropio = espacioSemilla.getId();
+
+//            Act
+                boolean existe = espacioRepository
+                        .existsByNombreEspacioIgnoreCaseAndIdNot(
+                                         "Sala A",idPropio);
+//                Assert
+                assertThat(existe)
+                        .as("El propio registro no debe contar como duplicado")
+                        .isFalse();
+            }
+
+            @Test
+            @DisplayName("debe retornar false cuando el nombre existe en el sistema")
+            void shouldReturnFalse_whenNombreDoesNotExists(){
+//                Act
+                boolean existe = espacioRepository
+                        .existsByNombreEspacioIgnoreCaseAndIdNot("Nombre Nuevo",1L);
+
+//                Assert
+                assertThat(existe).isFalse();
+            }
+        }
+    }
 
 }

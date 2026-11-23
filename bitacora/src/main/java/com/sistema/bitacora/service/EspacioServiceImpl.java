@@ -44,8 +44,9 @@ public class EspacioServiceImpl implements EspacioService {
                 .with(Sort.Direction.ASC)
                 .ignoreCase();
         Sort sort = Sort.by(order);
-        return this.espacioRepository.findByNombreContainigIgnoreCase(infix,sort);
+        return this.espacioRepository.findByNombreContainingIgnoreCase(infix,sort);
     }
+
 
     @Override
     public EspacioResponse createEspacio(EspacioRequest request) {

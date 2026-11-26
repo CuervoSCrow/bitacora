@@ -3,6 +3,7 @@ package com.sistema.bitacora.repository;
 import com.sistema.bitacora.dto.espacio.EspacioResponse;
 import com.sistema.bitacora.entity.Espacio;
 import com.sistema.bitacora.entity.enums.EstadoEspacio;
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -36,6 +37,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class EspacioRepositoryTest {
     @Autowired
     private EspacioRepository espacioRepository;
+    @Autowired
+    private EntityManager entityManager;
+
     private Espacio espacioSemilla;
 
     @BeforeEach
@@ -75,7 +79,7 @@ public class EspacioRepositoryTest {
                 .build());
     }// fin setup
 
-//    =================================================
+    //    =================================================
 //          findEspacioById
 //    =================================================
     @Nested
@@ -226,6 +230,7 @@ public class EspacioRepositoryTest {
     //    =================================================
 //      findByNombreContainingIgnoreCase
 //    =================================================
+
     @Nested
     @DisplayName("findByNombreContainingIgnoreCase(String, Sort)")
     class FindByNombreContainingIgnoreCase {
@@ -322,65 +327,130 @@ public class EspacioRepositoryTest {
 
             assertThat(resultado).isEmpty();
         }
+    }
 
-        //    ==========================================================
+//    ==========================================================
 //      existsByNombreEspacioIgnoreCaseAndIdnot(String ,Long)
 //    ==========================================================
-        @Nested
-        @DisplayName("existsByNombreEspacioIgnoreCaseAndIdNot(String, Long")
-        class ExistsByNombreEspacioIgnoreCaseAndIdNot {
 
-            @Test
-            @DisplayName("debe retornar true cuando otro registro tiene el mismo nombre")
-            void shouldReturnTrue_whenAnotherRecordHasSameNombre() {
+    @Nested
+    @DisplayName("existsByNombreEspacioIgnoreCaseAndIdNot(String, Long")
+    class ExistsByNombreEspacioIgnoreCaseAndIdNot {
+
+        @Test
+        @DisplayName("debe retornar true cuando otro registro tiene el mismo nombre")
+        void shouldReturnTrue_whenAnotherRecordHasSameNombre() {
 //                Arrange
-                Long otro_Id = 999_999L;
+            Long otro_Id = 999_999L;
 
 //                Act
-                boolean existe = espacioRepository
-                        .existsByNombreEspacioIgnoreCaseAndIdNot("Sala A", otro_Id);
+            boolean existe = espacioRepository
+                    .existsByNombreEspacioIgnoreCaseAndIdNot("Sala A", otro_Id);
 
 //                Assert
-                assertThat(existe).isTrue();
-            }
+            assertThat(existe).isTrue();
+        }
 
-            @Test
-            @DisplayName("debe ignorar mayúsculas/minúsculas al comparar")
-            void shouldIgnoreCase_whenComparingNombre() {
+        @Test
+        @DisplayName("debe ignorar mayúsculas/minúsculas al comparar")
+        void shouldIgnoreCase_whenComparingNombre() {
 //                Act
-                boolean existe = espacioRepository.existsByNombreEspacioIgnoreCaseAndIdNot(
-                        "sAlA a", 999_999L);
+            boolean existe = espacioRepository.existsByNombreEspacioIgnoreCaseAndIdNot(
+                    "sAlA a", 999_999L);
 //                Assert
-                assertThat(existe).isTrue();
-            }
+            assertThat(existe).isTrue();
+        }
 
-            @Test
-            @DisplayName("debe retornar fálse cuando el nombre pertenece al mismo ID")
-            void shouldReturnFalse_whenNombreBelongToSameId(){
+        @Test
+        @DisplayName("debe retornar fálse cuando el nombre pertenece al mismo ID")
+        void shouldReturnFalse_whenNombreBelongToSameId() {
 //                Arrange
-                Long idPropio = espacioSemilla.getId();
+            Long idPropio = espacioSemilla.getId();
 
 //            Act
-                boolean existe = espacioRepository
-                        .existsByNombreEspacioIgnoreCaseAndIdNot(
-                                         "Sala A",idPropio);
+            boolean existe = espacioRepository
+                    .existsByNombreEspacioIgnoreCaseAndIdNot(
+                            "Sala A", idPropio);
 //                Assert
-                assertThat(existe)
-                        .as("El propio registro no debe contar como duplicado")
-                        .isFalse();
-            }
+            assertThat(existe)
+                    .as("El propio registro no debe contar como duplicado")
+                    .isFalse();
+        }
 
-            @Test
-            @DisplayName("debe retornar false cuando el nombre existe en el sistema")
-            void shouldReturnFalse_whenNombreDoesNotExists(){
+        @Test
+        @DisplayName("debe retornar false cuando el nombre existe en el sistema")
+        void shouldReturnFalse_whenNombreDoesNotExists() {
 //                Act
-                boolean existe = espacioRepository
-                        .existsByNombreEspacioIgnoreCaseAndIdNot("Nombre Nuevo",1L);
+            boolean existe = espacioRepository
+                    .existsByNombreEspacioIgnoreCaseAndIdNot("Nombre Nuevo", 1L);
 
 //                Assert
-                assertThat(existe).isFalse();
-            }
+            assertThat(existe).isFalse();
         }
     }
 
+    // ==========================================================
+    //   ★ Integración del EstadoEspacioConverter con JPA  ★
+    // ==========================================================
+
+    @Nested
+    @DisplayName("EstadoEspacioConverter - integracion con persistencia real")
+    class EstadoEspacioConverterIntegracion{
+        @Test
+        @DisplayName("Debe Persistir y recuperar el estadoActual via converter (round - trip a BD")
+        void shouldPersistAndRetrieveEstadoActual_viaConverter(){
+//            Arrange
+            Espacio espacio = anEspacio()
+                    .withNombreEspacio("Sala Converter")
+                    .withUbicacion("Piso 7")
+                    .withCapacidad(25)
+                    .withEstadoActual(EstadoEspacio.MANTENIMIENTO)
+                    .withActivo(true)
+                    .build();
+            Espacio guardado = espacioRepository.save(espacio);
+//            ACT
+            entityManager.flush();  // fuerza el INSERT a BD (ejecuta converter Java -> BD)
+            entityManager.clear(); // vacia la cache de 1er nivel de Hibernate
+            Optional<Espacio> recargado = espacioRepository.findById(guardado.getId());
+
+//            Assert
+            assertThat(recargado)
+                    .as("El converter debe sobrevivir el round-trip a BD")
+                    .isPresent()
+                    .get()
+                    .extracting(Espacio::getEstadoActual)
+                    .isEqualTo(EstadoEspacio.MANTENIMIENTO);
+        }
+
+        @Test
+        @DisplayName("Debe guardar el estadoActual en minusculas en la columna(SQL nativo)")
+        void shouldStoreEstadoActualInLowercase_inDatabase(){
+//            Arrange
+            Espacio espacio = anEspacio()
+                    .withNombreEspacio("Sala Minusculas")
+                    .withUbicacion("Piso 8")
+                    .withCapacidad(10)
+                    .withEstadoActual(EstadoEspacio.OCUPADO)
+                    .withActivo(true)
+                    .build();
+            Espacio guardado = espacioRepository.save(espacio);
+
+//            Act - Leemos la columna cruda con sql nativo
+            entityManager.flush();
+            entityManager.clear();
+            String valorCrudo = (String) entityManager
+                    .createNativeQuery("SELECT estado_actual FROM espacios WHERE id=:id")
+                    .setParameter("id",guardado.getId())
+                    .getSingleResult();
+//            Assert - el converter debio persistir "ocupado" no "OCUPADO"
+            assertThat(valorCrudo)
+                    .as("El converter persiste en minúsculas; si ves mayúsculas," +
+                            "algo cambió")
+                    .isEqualTo("ocupado");
+
+        }
+    }
 }
+
+
+

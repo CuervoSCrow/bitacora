@@ -24,4 +24,13 @@ public class EstadoEspacioConverter implements
             return EstadoEspacio.DISPONIBLE; // o null segun tu logica
         }
     }
+
+//    Rompemos al propposito el converter para demostrar
+//    @Override
+//    public EstadoEspacio convertToEntityAttribute(String dbData){
+//        if(dbData==null)return null;
+//        // ⚠️ VERSIÓN ROTA A PROPÓSITO PARA EL EJERCICIO ⚠️
+//        // Siempre devuelve DISPONIBLE, ignorando el valor real de la BD.
+//        return EstadoEspacio.DISPONIBLE;// <- Roto a Proposito siempre devuelve Disponible
+//    }
 }

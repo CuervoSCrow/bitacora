@@ -119,8 +119,13 @@ class EspacioRequestValidationTest {
                     .build();
 //            Act + Assert
             assertThat(violationMessages(request))
-                    .containsExactly("El nombre del espacio debe ser obligatorio");
+                    .as("Un String vacío dispara @NotBlank Y @Size simultáneamente")
+                    .containsExactlyInAnyOrder(
+                            "El nombre del espacio es obligatorio",
+                            "El nombre debe tener entre 2 y 100 caracteres"
+                    );
         }
+        void shouldFail_when
     }
 
 }
